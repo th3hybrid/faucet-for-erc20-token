@@ -33,7 +33,8 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
  */
 
 contract CodeToken is ERC20, Ownable {
-    constructor(
-        uint256 _initialSupply
-    ) ERC20("CodeToken", "CT") Ownable(msg.sender) {}
+    constructor() ERC20("CodeToken", "CT") Ownable(msg.sender) {
+        uint256 initialSupply = 1_000_000_000 * 10 ** decimals();
+        _mint(msg.sender, initialSupply);
+    }
 }
