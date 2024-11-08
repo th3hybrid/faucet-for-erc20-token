@@ -43,12 +43,19 @@ contract CodeTokenFaucet {
     uint256 private constant WITHDRAWAL_AMOUNT = 1000 ether;
     mapping(address => uint256) private s_timeLeftToClaim;
 
+    //events
+    event TokensClaimed(
+        address indexed claimant,
+        uint256 amount,
+        uint256 nextClaimTime
+    );
+
     //functions
     constructor(address _codeToken) {
         i_codeToken = CodeToken(_codeToken);
     }
 
-    function claim() public {
+    function claim() external {
         //basically you can only request for token transfer once every 24 hours
         //checks if token to claim is available from current balance
         if (WITHDRAWAL_AMOUNT > IERC20(i_codeToken).balanceOf(address(this))) {
@@ -56,12 +63,21 @@ contract CodeTokenFaucet {
         }
 
         //checks if 24 hours has passed
-        if (block.timestamp < s_timeLeftToClaim[msg.sender]) {
+        if (s_timeLeftToClaim[msg.sender] > block.timestamp) {
             revert CodeTokenFaucet__ClaimTimeNotComplete();
         }
 
         IERC20(i_codeToken).transfer(msg.sender, WITHDRAWAL_AMOUNT);
         //set the timestamp after the withdrawal and be able to check for each user
         s_timeLeftToClaim[msg.sender] = block.timestamp + 1 days;
+        emit TokensClaimed(
+            msg.sender,
+            WITHDRAWAL_AMOUNT,
+            s_timeLeftToClaim[msg.sender]
+        );
+    }
+
+    function getCTAddress() public view returns (address) {
+        return address(i_codeToken);
     }
 }
