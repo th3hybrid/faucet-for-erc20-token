@@ -62,4 +62,12 @@ contract CodeTokenFaucetTest is Test {
     function testCTAddressGetsSet() public view {
         assertEq(ctFaucet.getCTAddress(), address(ct));
     }
+
+    function testCanCheckTimeLeft() public {
+        ctFaucet.claim(HYBRID);
+        assertEq(ctFaucet.checkTimeLeftToClaim(HYBRID), 1 days);
+        vm.warp(block.timestamp + 1 days);
+        vm.roll(block.number + 3);
+        assertEq(ctFaucet.checkTimeLeftToClaim(HYBRID), 0);
+    }
 }

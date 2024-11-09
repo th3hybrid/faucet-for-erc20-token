@@ -76,4 +76,12 @@ contract CodeTokenFaucet {
     function getCTAddress() public view returns (address) {
         return address(i_codeToken);
     }
+
+    function checkTimeLeftToClaim(address user) public view returns (uint256) {
+        if (s_timeLeftToClaim[user] > block.timestamp) {
+            return s_timeLeftToClaim[user] - block.timestamp;
+        } else {
+            return 0;
+        }
+    }
 }
