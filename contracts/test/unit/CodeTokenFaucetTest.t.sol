@@ -27,31 +27,25 @@ contract CodeTokenFaucetTest is Test {
 
     function testCanClaimToken() public {
         uint256 startingUserBalance = ct.balanceOf(HYBRID);
-        vm.startPrank(HYBRID);
-        ctFaucet.claim();
-        vm.stopPrank();
+        ctFaucet.claim(HYBRID);
         uint256 endUserBalance = ct.balanceOf(HYBRID);
         assert(startingUserBalance == 0);
         assert(endUserBalance == WITHDRAWAL_AMOUNT);
     }
 
     function testCannotClaimUntilDurationComplete() public {
-        vm.startPrank(HYBRID);
-        ctFaucet.claim();
+        ctFaucet.claim(HYBRID);
         vm.expectRevert(
             CodeTokenFaucet.CodeTokenFaucet__ClaimTimeNotComplete.selector
         );
-        ctFaucet.claim();
-        vm.stopPrank();
+        ctFaucet.claim(HYBRID);
     }
 
     function testCanClaimAgainAfterDuration() public {
-        vm.startPrank(HYBRID);
-        ctFaucet.claim();
+        ctFaucet.claim(HYBRID);
         vm.warp(block.timestamp + 1 days);
         vm.roll(block.number + 3);
-        ctFaucet.claim();
-        vm.stopPrank();
+        ctFaucet.claim(HYBRID);
         assert(ct.balanceOf(HYBRID) == (WITHDRAWAL_AMOUNT + WITHDRAWAL_AMOUNT));
     }
 
@@ -59,12 +53,10 @@ contract CodeTokenFaucetTest is Test {
         vm.startPrank(address(ctFaucet));
         ct.transfer(HYBRID, INITIAL_SUPPLY);
         vm.stopPrank();
-        vm.startPrank(HYBRID);
         vm.expectRevert(
             CodeTokenFaucet.CodeTokenFaucet__InsufficientBalance.selector
         );
-        ctFaucet.claim();
-        vm.stopPrank();
+        ctFaucet.claim(HYBRID);
     }
 
     function testCTAddressGetsSet() public view {
